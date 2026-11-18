@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Property Issuance Report</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <style>
+
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
+    }
+
+    @media print {
+
+        .no-print {
+            display: none !important;
+        }
+
+        body {
+            background: white !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .col-md-3 {
+            width: 25% !important;
+        }
+
+        .table-responsive {
+            overflow: visible !important;
+        }
+
+        table {
+            width: 100% !important;
+            font-size: 10px;
+        }
+
+        th, td {
+            vertical-align: middle !important;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tr, .card {
+            break-inside: avoid;
+        }
+
+    }
+
+</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/branding.css') }}">
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/school_property_logo.png') }}">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5 mb-5">
+
+    <!-- Report Title -->
+    <div class="text-center mb-4">
+        <h3>School Property Issuance Report</h3>
+        <p>
+            School Property Custodian Inventory
+            and Management System
+        </p>
+    </div>
+
+ <!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} no-print"
+                 role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<!-- Issuance Summary -->
+<div class="row g-3 mb-4">
+
+    <!-- Total Transactions -->
+    <div class="col-md-3">
+        <div class="card border-primary h-100">
+            <div class="card-body text-center">
+                <h6>Total Issuance Transactions</h6>
+                <h2 class="text-primary">
+                    {{ total_transactions }}
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Issued Quantity -->
+    <div class="col-md-3">
+        <div class="card border-secondary h-100">
+            <div class="card-body text-center">
+                <h6>Total Issued Quantity</h6>
+                <h2 class="text-secondary">
+                    {{ total_issued_quantity }}
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Good Condition -->
+    <div class="col-md-3">
+        <div class="card border-success h-100">
+            <div class="card-body text-center">
+                <h6>Issued in Good Condition</h6>
+                <h2 class="text-success">
+                    {{ total_good }}
+                </h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fair Condition -->
+    <div class="col-md-3">
+        <div class="card border-warning h-100">
+            <div class="card-body text-center">
+                <h6>Issued in Fair Condition</h6>
+                <h2 class="text-warning">
+                    {{ total_fair }}
+                </h2>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Date Filter -->
+<div class="card mb-4 no-print">
+    <div class="card-body">
+
+        <h5 class="card-title mb-3">
+            Filter Issuance Report by Date
+        </h5>
+
+        <form method="GET"
+              action="{{ url_for('reports.issuance_report') }}">
+
+            <div class="row g-3 align-items-end">
+
+                <!-- From Date -->
+                <div class="col-md-4">
+                    <label for="from_date" class="form-label">
+                        From Date
+                    </label>
+
+                    <input type="date"
+                           id="from_date"
+                           name="from_date"
+                           class="form-control"
+                           value="{{ from_date }}">
+                </div>
+
+                <!-- To Date -->
+                <div class="col-md-4">
+                    <label for="to_date" class="form-label">
+                        To Date
+                    </label>
+
+                    <input type="date"
+                           id="to_date"
+                           name="to_date"
+                           class="form-control"
+                           value="{{ to_date }}">
+                </div>
+
+                <!-- Filter and Reset -->
+                <div class="col-md-4">
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Filter
+                    </button>
+
+                    <a href="{{ url_for('reports.issuance_report') }}"
+                       class="btn btn-outline-secondary">
+                        Reset
+                    </a>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- Report Buttons -->
+<div class="mb-3 no-print">
+
+    <button type="button"
+            onclick="window.print()"
+            class="btn btn-success">
+        Print Report
+    </button>
+
+    <a href="{{ url_for('reports.reports_home') }}"
+       class="btn btn-secondary">
+        Back to Reports
+        </a>
+
+</div>
+
+<!-- Issuance Table -->
+<div class="table-responsive">
+
+        <table class="table table-bordered table-striped">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>No.</th>
+                    <th>Property Code</th>
+                    <th>Property Name</th>
+                    <th>Issued To</th>
+                    <th>Position</th>
+                    <th>Office / Room</th>
+                    <th>Quantity</th>
+                    <th>Date Issued</th>
+                    <th>Condition</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in issuances %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    {% set property_item = property_lookup.get(item.property_id) %}
+
+                    <td>
+                        {{ property_item.property_code if property_item else "-" }}
+                    </td>
+
+                    <td>
+                        {{ property_item.property_name if property_item else "-" }}
+                    </td>
+                    <td>{{ item.issued_to }}</td>
+                    <td>{{ item.position or "-" }}</td>
+                    <td>{{ item.office_room or "-" }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.date_issued }}</td>
+                    <td class="text-center">
+
+    {% if item.condition_status == "Good" %}
+
+        <span class="badge bg-success">
+            Good
+        </span>
+
+    {% elif item.condition_status == "Fair" %}
+
+        <span class="badge bg-warning text-dark">
+            Fair
+        </span>
+
+    {% else %}
+
+        <span class="badge bg-secondary">
+            {{ item.condition_status or "-" }}
+        </span>
+
+    {% endif %}
+
+</td>
+                    <td>{{ item.remarks or "-" }}</td>
+                </tr>
+
+                {% else %}
+                <tr>
+                    <td colspan="10" class="text-center">
+                        No issuance records found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Total Records -->
+    <div class="mt-3">
+        <strong>Total Issuance Transactions:</strong>
+        {{ issuances|length }}
+    </div>
+
+</div>
+
+</body>
+</html>

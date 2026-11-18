@@ -1,0 +1,24 @@
+
+# Private configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Editor and temporary files
+.vscode/
+.idea/
+*.log

@@ -1,0 +1,107 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Property Issuances</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/branding.css') }}">
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/school_property_logo.png') }}">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>Property Issuances</h2>
+            <p class="text-muted">
+                List of issued school properties.
+            </p>
+        </div>
+
+        <a href="{{ url_for('issuance.add_issuance') }}"
+           class="btn btn-primary">
+            + Issue Property
+        </a>
+
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Issuance Table -->
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-striped">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Property ID</th>
+                    <th>Issued To</th>
+                    <th>Position</th>
+                    <th>Office / Room</th>
+                    <th>Quantity</th>
+                    <th>Date Issued</th>
+                    <th>Condition</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for issuance in issuances %}
+
+                <tr>
+                    <td>{{ issuance.id }}</td>
+                    <td>{{ issuance.property_id }}</td>
+                    <td>{{ issuance.issued_to }}</td>
+                    <td>{{ issuance.position or '-' }}</td>
+                    <td>{{ issuance.office_room or '-' }}</td>
+                    <td>{{ issuance.quantity }}</td>
+                    <td>{{ issuance.date_issued }}</td>
+                    <td>{{ issuance.condition_status or '-' }}</td>
+                    <td>{{ issuance.remarks or '-' }}</td>
+                </tr>
+
+                {% else %}
+
+                <tr>
+                    <td colspan="9" class="text-center">
+                        No issuance records found.
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <a href="{{ url_for('dashboard') }}"
+       class="btn btn-secondary mt-3">
+        Back to Dashboard
+    </a>
+
+</div>
+
+</body>
+</html>

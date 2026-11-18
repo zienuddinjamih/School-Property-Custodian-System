@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - School Property System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/branding.css') }}">
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/school_property_logo.png') }}">
+</head>
+<body class="bg-light">
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <span class="navbar-brand"><img class="brand-mark" src="{{ url_for('static', filename='img/school_property_logo.png') }}" alt="School Property System logo">School Property System</span>
+            <div class="d-flex gap-2 align-items-center">
+            <a href="{{ url_for('auth.profile') }}" class="btn btn-outline-light">My Profile</a>
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-light">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Content -->
+    <div class="container mt-5 mb-5">
+        <h2>School Property Dashboard</h2>
+        <p class="text-muted">Overview of school property inventory.</p>
+
+        <!-- Summary Cards -->
+        <div class="row g-3 mt-3">
+            <div class="col-md-4"><div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <h6 class="text-muted">Total Property Records</h6>
+                <h2 class="text-primary">{{ total_properties }}</h2>
+            </div></div></div>
+            <div class="col-md-4"><div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <h6 class="text-muted">Total Inventory Units</h6>
+                <h2 class="text-dark">{{ total_quantity }}</h2>
+            </div></div></div>
+            <div class="col-md-4"><div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <h6 class="text-muted">Available Quantity</h6>
+                <h2 class="text-success">{{ available }}</h2>
+            </div></div></div>
+            <div class="col-md-4"><div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <h6 class="text-muted">In Use Quantity</h6>
+                <h2 class="text-primary">{{ in_use }}</h2>
+            </div></div></div>
+            <div class="col-md-4"><div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <h6 class="text-muted">Needs Repair Quantity</h6>
+                <h2 class="text-warning">{{ under_repair }}</h2>
+            </div></div></div>
+            <div class="col-md-4"><div class="card shadow-sm border-0 h-100"><div class="card-body">
+                <h6 class="text-muted">Damaged Quantity</h6>
+                <h2 class="text-danger">{{ damaged }}</h2>
+            </div></div></div>
+        </div>
+
+        <!-- Inventory Condition Overview -->
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-body">
+                <h5>Inventory Condition Overview</h5>
+                <p class="text-muted">Condition of units not currently issued.</p>
+                {% set condition_total = good + fair + under_repair + damaged %}
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center">
+                        {% if condition_total > 0 %}
+                            {% set good_end = good / condition_total * 100 %}
+                            {% set fair_end = (good + fair) / condition_total * 100 %}
+                            {% set repair_end = (good + fair + under_repair) / condition_total * 100 %}
+                            <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center"
+                                 style="width: 220px; height: 220px; background: conic-gradient(#198754 0% {{ good_end }}%, #ffc107 {{ good_end }}% {{ fair_end }}%, #6c757d {{ fair_end }}% {{ repair_end }}%, #dc3545 {{ repair_end }}% 100%);">
+                                <div class="bg-white rounded-circle d-flex flex-column align-items-center justify-content-center"
+                                     style="width: 150px; height: 150px;">
+                                    <h2 class="mb-0">{{ condition_total }}</h2>
+                                    <small class="text-muted">Unissued Units</small>
+                                </div>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">No unissued inventory units.</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mt-3">
+                        <div class="bg-success-subtle rounded p-3 mb-2">Good: <strong>{{ good }}</strong></div>
+                        <div class="bg-warning-subtle rounded p-3 mb-2">Fair: <strong>{{ fair }}</strong></div>
+                        <div class="bg-secondary-subtle rounded p-3 mb-2">Needs Repair: <strong>{{ under_repair }}</strong></div>
+                        <div class="bg-danger-subtle rounded p-3 mb-2">Damaged: <strong>{{ damaged }}</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property Management -->
+        <div class="mt-5">
+            <h4>Property Management</h4>
+            <p class="text-muted">Manage and monitor school properties.</p>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('property.list_properties') }}" class="btn btn-primary">View School Properties</a>
+                <a href="{{ url_for('issuance.list_issuances') }}" class="btn btn-success">Property Issuances</a>
+                <a href="{{ url_for('returns.list_returns') }}" class="btn btn-warning">Property Returns</a>
+                <a href="{{ url_for('reports.reports_home') }}" class="btn btn-info">Property Reports</a>
+                <a href="{{ url_for('transfer.transfer_list') }}" class="btn btn-secondary">Property Transfers</a>
+                <a href="{{ url_for('disposal.disposal_list') }}" class="btn btn-danger">Property Disposals</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

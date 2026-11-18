@@ -1,0 +1,381 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Property Return Report</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    
+<style>
+    @media print {
+
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        body {
+            background: white !important;
+            font-size: 11px;
+        }
+
+        .container {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .table-responsive {
+            overflow: visible !important;
+        }
+
+        table {
+            width: 100% !important;
+            table-layout: auto;
+            font-size: 9px !important;
+        }
+
+        th, td {
+            padding: 5px !important;
+            vertical-align: middle !important;
+            overflow-wrap: anywhere;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tr {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .row {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+        }
+
+        .row > .col-md-4 {
+            width: 16.6667% !important;
+            flex: 0 0 16.6667% !important;
+        }
+
+        .card {
+            break-inside: avoid;
+            box-shadow: none !important;
+        }
+
+        .card-body {
+            padding: 6px !important;
+        }
+
+        .card-body h6 {
+            font-size: 9px !important;
+        }
+
+        .card-body h3 {
+            font-size: 17px !important;
+            margin-bottom: 0 !important;
+        }
+
+        .badge {
+            font-size: 8px !important;
+            white-space: nowrap;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .table-dark {
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+        }
+    }
+</style>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/branding.css') }}">
+<link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/school_property_logo.png') }}">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5 mb-5">
+
+    <!-- Report Title -->
+    <div class="text-center mb-4">
+        <h3>School Property Return Report</h3>
+        <p>
+            School Property Custodian Inventory
+            and Management System
+        </p>
+    </div>
+
+<!-- Return Report Summary -->
+<div class="row g-3 mb-4">
+
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6>Total Transactions</h6>
+                <h3>{{ total_transactions }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6>Total Returned</h6>
+                <h3>{{ total_returned_quantity }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6>Good</h6>
+                <h3 class="text-success">{{ total_good }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6>Fair</h6>
+                <h3 class="text-warning">{{ total_fair }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6>Needs Repair</h6>
+                <h3 class="text-secondary">{{ total_needs_repair }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h6>Damaged</h6>
+                <h3 class="text-danger">{{ total_damaged }}</h3>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Flash Messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="no-print">
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show"
+                     role="alert">
+
+                    {{ message }}
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Close">
+                    </button>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+   
+<!-- Date Filter -->
+<div class="card mb-4 no-print">
+    <div class="card-body">
+
+        <h5 class="card-title mb-3">
+            Filter Return Report by Date
+        </h5>
+
+        <form method="GET"
+              action="{{ url_for('reports.return_report') }}">
+
+            <div class="row g-3 align-items-end">
+
+                <!-- From Date -->
+                <div class="col-md-4">
+                    <label for="from_date" class="form-label">
+                        From Date
+                    </label>
+
+                    <input type="date"
+                           id="from_date"
+                           name="from_date"
+                           class="form-control"
+                           value="{{ from_date }}">
+                </div>
+
+                <!-- To Date -->
+                <div class="col-md-4">
+                    <label for="to_date" class="form-label">
+                        To Date
+                    </label>
+
+                    <input type="date"
+                           id="to_date"
+                           name="to_date"
+                           class="form-control"
+                           value="{{ to_date }}">
+                </div>
+
+                <!-- Filter and Reset -->
+                <div class="col-md-4">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Filter
+                    </button>
+
+                    <a href="{{ url_for('reports.return_report') }}"
+                       class="btn btn-outline-secondary">
+                        Reset
+                    </a>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- Report Buttons -->
+<div class="mb-3 no-print">
+
+    <button type="button"
+            onclick="window.print()"
+            class="btn btn-success">
+        Print Report
+    </button>
+
+    <a href="{{ url_for('reports.reports_home') }}"
+       class="btn btn-secondary">
+        Back to Reports
+    </a>
+
+</div>
+
+
+    <!-- Return Table -->
+    <div class="table-responsive">
+
+        <table class="table table-bordered table-striped">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>No.</th>
+                    <th>Property Code</th>
+                    <th>Property Name</th>
+                    <th>Returned By</th>
+                    <th>Quantity</th>
+                    <th>Date Returned</th>
+                    <th>Condition</th>
+                    <th>Remarks</th>
+                    <th>Received By</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for item in returns %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+
+                    {% set property_item = property_lookup.get(item.property_id) %}
+
+                    <td>
+                        {{ property_item.property_code if property_item else "-" }}
+                    </td>
+
+                    <td>
+                        {{ property_item.property_name if property_item else "-" }}
+                    </td>
+
+                    <td>{{ item.returned_by }}</td>
+
+                    <td>{{ item.quantity }}</td>
+
+                    <td>{{ item.date_returned }}</td>
+
+                    
+<td>
+    {% if item.condition_status == "Good" %}
+        <span class="badge bg-success">
+            Good
+        </span>
+
+    {% elif item.condition_status == "Fair" %}
+        <span class="badge bg-warning text-dark">
+            Fair
+        </span>
+
+    {% elif item.condition_status == "Needs Repair" %}
+        <span class="badge bg-secondary">
+            Needs Repair
+        </span>
+
+    {% elif item.condition_status == "Damaged" %}
+        <span class="badge bg-danger">
+            Damaged
+        </span>
+
+    {% else %}
+        <span class="badge bg-light text-dark">
+            {{ item.condition_status or "-" }}
+        </span>
+    {% endif %}
+</td>
+                    <td>
+                        {{ item.remarks or "-" }}
+                    </td>
+
+                    <td>
+                        {{ user_lookup.get(item.received_by, "-") }}
+                    </td>
+                </tr>
+
+                {% else %}
+                <tr>
+                    <td colspan="9" class="text-center">
+                        No return records found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- Total Records -->
+    <div class="mt-3">
+        <strong>Total Return Transactions:</strong>
+        {{ returns|length }}
+    </div>
+
+</div>
+
+</body>
+</html>
